@@ -11,6 +11,9 @@ const baseUrl = "https://hacker-news.firebaseio.com/v0/"
 const ts = baseUrl + "topstories.json"
 
 type Article struct {
+	Id int64 `json:"id,omitempty"`
+	Author string `json:"by,omitempty"`
+	Title string `json:"title,omitempty"`
 	Score int `json:"score,omitempty"`
 	Url string `json:"url,omitempty"`
 }
@@ -30,11 +33,8 @@ func main() {
 
 	ch := make(chan string)
 	for _, itemId := range itemIds[:10] {
-		fmt.Println(itemId)
 		go getArticle(itemId, ch)
 	}
-
-	fmt.Printf("Total number of articles:%d\n", len(itemIds))
 
 	for range itemIds[:10] {
 		fmt.Println(<-ch)
@@ -55,5 +55,5 @@ func getArticle(articleId int64, ch chan<-string) {
 		panic(err)
 	}
 
-	ch <- fmt.Sprintf("Article %d response. Score:%d, Url:%s", articleId, article.Score, article.Url)
+	ch <- fmt.Sprintf("Id: %d\nTitle: %s\nAuthor: %s\nScore:%d\nUrl:%s\n\n", article.Id, article.Title, article.Author, article.Score, article.Url)
 }
