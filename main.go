@@ -10,6 +10,11 @@ import (
 const baseUrl = "https://hacker-news.firebaseio.com/v0/"
 const ts = baseUrl + "topstories.json"
 
+type Article struct {
+	Score int `json:"score,omitempty"`
+	Url string `json:"url,omitempty"`
+}
+
 func main() {
 
 	resp, err := http.Get(ts)
@@ -45,5 +50,10 @@ func getArticle(articleId int64, ch chan<-string) {
 	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
-	ch <- fmt.Sprintf("Article %d response:%s", articleId, body)
+	var article Article
+	if err := json.Unmarshal(body, &article); err != nil {
+		panic(err)
+	}
+
+	ch <- fmt.Sprintf("Article %d response. Score:%d, Url:%s", articleId, article.Score, article.Url)
 }
